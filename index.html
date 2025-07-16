@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AstroSan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap");
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      :root {
+        --space-blue: #0b0b2b;
+        --cosmic-purple: #4d2d73;
+        --nebula-pink: #ff6ad5;
+        --starlight: #f8f8ff;
+        --plasma-blue: #00a3ff;
+      }
+
+      body {
+        font-family: "Space Mono", monospace;
+        background-color: var(--space-blue);
+        color: var(--starlight);
+        overflow-x: hidden;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Orbitron", sans-serif;
+      }
+
+      .astronaut-bg {
+        background: radial-gradient(
+          circle at center,
+          var(--space-blue) 0%,
+          #000000 100%
+        );
+        background-size: 400% 400%;
+        animation: spaceBackground 15s ease infinite;
+      }
+
+      @keyframes spaceBackground {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .star {
+        position: absolute;
+        background-color: white;
+        border-radius: 50%;
+        animation: twinkle var(--duration) ease-in-out infinite;
+      }
+
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0.2;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      .astronaut-card {
+        background: rgba(13, 13, 43, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(77, 45, 115, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .astronaut-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(77, 45, 115, 0.4);
+      }
+
+      .project-card {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(0, 163, 255, 0.2);
+      }
+
+      .project-overlay {
+        position: absolute;
+        bottom: -100%;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(13, 13, 43, 0.9), transparent);
+        transition: bottom 0.3s ease;
+        padding: 1rem;
+      }
+
+      .project-card:hover .project-overlay {
+        bottom: 0;
+      }
+
+      .nav-link {
+        position: relative;
+      }
+
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--plasma-blue);
+        transition: width 0.3s ease;
+      }
+
+      .nav-link:hover::after {
+        width: 100%;
+      }
+
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-15px);
+        }
+      }
+
+      .contact-input {
+        background: rgba(13, 13, 43, 0.7);
+        border: 1px solid var(--cosmic-purple);
+        color: white;
+      }
+
+      .contact-input:focus {
+        border-color: var(--plasma-blue);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 163, 255, 0.3);
+      }
+
+      .glow-btn {
+        box-shadow: 0 0 15px rgba(0, 163, 255, 0.5);
+        transition: all 0.3s ease;
+      }
+
+      .glow-btn:hover {
+        box-shadow: 0 0 30px rgba(0, 163, 255, 0.8);
+      }
+      .star,
+      .planet,
+      .sky-object {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 4;
+      }
+
+      .planet {
+        box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+        z-index: 5;
+      }
+
+      .sky-object.bright-star {
+        box-shadow: 0 0 12px #fff;
+      }
+
+      .sky-object.nebula {
+        filter: blur(20px);
+      }
+
+      .sky-object.galaxy {
+        filter: blur(30px);
+      }
+
+      .sky-object.comet {
+        animation: comet-fly 12s linear infinite;
+      }
+
+      @keyframes planet-spin {
+        0% {
+          transform: rotate(0deg) translateX(0);
+        }
+        100% {
+          transform: rotate(360deg) translateX(0);
+        }
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(0) scale(1);
+        }
+        100% {
+          transform: translateY(-10px) scale(1.05);
+        }
+      }
+
+      @keyframes comet-fly {
+        0% {
+          transform: translateX(-200px) translateY(0);
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(800px) translateY(-200px);
+          opacity: 0;
+        }
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body class="astronaut-bg min-h-screen relative">
+    <div id="stars-container" class="fixed inset-0 z-0"></div>
+    <!-- Stars Background -->
+    <div
+      id="stars-container"
+      class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
+    ></div>
+
+    <!-- Navigation -->
+    <nav class="py-6 px-4 md:px-12 lg:px-24 fixed w-full z-50 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <a
+          href="#"
+          class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600"
+          >ASTROSAN<span class="text-white">PORTFOLIO</span></a
+        >
+        <div class="hidden md:flex space-x-8">
+          <a href="#home" class="nav-link text-white">HOME</a>
+          <a href="#about" class="nav-link text-white">ABOUT</a>
+          <a href="#projects" class="nav-link text-white">PROJECTS</a>
+          <a href="#skills" class="nav-link text-white">SKILLS</a>
+          <a href="#contact" class="nav-link text-white">CONTACT</a>
+        </div>
+        <button class="md:hidden text-white">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section
+      id="home"
+      class="pt-32 pb-20 px-4 md:px-12 lg:px-24 min-h-screen flex items-center relative"
+    >
+      <div
+        class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+      >
+        <div>
+          <p class="text-blue-400 mb-4 animate-pulse">
+            WELCOME TO MY PORTFOLIO
+          </p>
+          <h1 class="text-5xl md:text-7xl font-bold mb-6">
+            HI, I'M
+            <span
+              class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600"
+              >IKHSAN</span
+            >
+          </h1>
+          <h2 class="text-2xl md:text-3xl mb-6 text-gray-300">
+            Fullstack Developer
+          </h2>
+          <p class="text-lg mb-8 max-w-lg">
+            I am a fullstack developer inspired by outer space, and I love
+            building websites with unique and futuristic designs.
+          </p>
+          <div class="flex space-x-4">
+            <a
+              href="#projects"
+              class="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full text-white glow-btn"
+              >VIEW WORK</a
+            >
+            <a
+              href="#contact"
+              class="px-8 py-3 border border-blue-400 rounded-full text-white hover:bg-blue-400 hover:bg-opacity-10"
+              >CONTACT ME</a
+            >
+          </div>
+        </div>
+        <div class="flex justify-center lg:justify-end relative">
+          <div class="relative">
+            <img
+              src="p3.jpg"
+              alt="3D rendered astronaut in modern space suit floating in space with Earth in the background"
+              class="rounded-lg w-full max-w-md astronaut-card animate-float shadow-2xl"
+            />
+            <div
+              class="absolute -top-8 -right-8 w-16 h-16 rounded-full bg-blue-500 blur-2xl opacity-60 animate-pulse"
+            ></div>
+            <div
+              class="absolute -bottom-12 -left-8 w-20 h-20 rounded-full bg-purple-500 blur-3xl opacity-40"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section
+      id="about"
+      class="py-20 px-4 md:px-12 lg:px-24 bg-gradient-to-b from-transparent to-black to-90%"
+    >
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-4xl font-bold mb-16 text-center relative">
+          <span class="relative inline-block">
+            ABOUT ME
+            <span
+              class="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full"
+            ></span>
+          </span>
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <img
+              src="p2.jpg"
+              alt="Close-up of astronaut helmet with reflection of distant galaxies and stars on the visor"
+              class="rounded-lg w-full astronaut-card"
+            />
+          </div>
+          <div>
+            <h3 class="text-2xl font-bold mb-6">Coding the Cosmos</h3>
+            <p class="text-lg mb-4">
+              Hi, I'm Muhamad Ikhsan Maulana, an 18-year-old frontend developer
+              who’s passionate about building immersive and creative web
+              experiences. My journey started when I discovered how endless the
+              digital world could be. Since then, I’ve been exploring both the
+              universe of code and the cosmos above us. My dream is to become
+              not just a skilled programmer, but also an astronomer — combining
+              technology and space to shape the future.
+            </p>
+            <p class="text-lg mb-6">
+              When I'm not coding, you'll find me reading about space
+              exploration, designing interfaces, or experimenting with new
+              technologies.
+            </p>
+
+            <div class="mb-8">
+              <h4 class="text-xl font-bold mb-4 text-blue-400">Experience</h4>
+              <div class="space-y-4">
+                <div class="astronaut-card p-4 rounded-lg">
+                  <div class="flex justify-between items-start">
+                    <h5 class="font-bold text-lg">
+                      internship as a backend developer
+                    </h5>
+                    <span class="text-sm text-gray-400">2024</span>
+                  </div>
+                </div>
+                <div class="astronaut-card p-4 rounded-lg">
+                  <div class="flex justify-between items-start">
+                    <h5 class="font-bold text-lg">Asisten Tahfidz</h5>
+                    <span class="text-sm text-gray-400">2022 - to date</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="text-xl font-bold mb-4 text-blue-400">Education</h4>
+              <div class="astronaut-card p-4 rounded-lg">
+                <div class="flex justify-between items-start">
+                  <h5 class="font-bold text-lg">
+                    Software Engineering Graduate
+                  </h5>
+                  <span class="text-sm text-gray-400">2022 - 2025</span>
+                </div>
+                <p class="text-gray-400">SMK ASSALAAM BANDUNG</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section
+      id="projects"
+      class="py-20 px-4 md:px-12 lg:px-24 bg-black bg-opacity-50"
+    >
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-4xl font-bold mb-16 text-center relative">
+          <span class="relative inline-block">
+            MY PROJECTS
+            <span
+              class="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full"
+            ></span>
+          </span>
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Project 1 -->
+          <div class="project-card rounded-lg overflow-hidden relative h-80">
+            <img
+              src="mbti.jpeg"
+              alt="Space tourism booking interface with futuristic UI elements showing planet destinations and flight details"
+              class="w-full h-full object-cover"
+            />
+            <div class="project-overlay">
+              <h3 class="text-xl font-bold mb-2">MBTI Test</h3>
+              <p class="text-sm mb-4">
+                A personality testing platform based on MBTI with interactive
+                and insightful results.
+              </p>
+              <div class="flex space-x-2">
+                <span
+                  class="text-xs px-2 py-1 bg-blue-500 bg-opacity-30 rounded-full"
+                  >Php</span
+                >
+                <span
+                  class="text-xs px-2 py-1 bg-red-500 bg-opacity-30 rounded-full"
+                  >CSS</span
+                >
+                <span
+                  class="text-xs px-2 py-1 bg-purple-500 bg-opacity-30 rounded-full"
+                  >HTML</span
+                >
+                <span
+                  class="text-xs px-2 py-1 bg-green-500 bg-opacity-30 rounded-full"
+                  >Laravel</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 2 -->
+          <div class="project-card rounded-lg overflow-hidden relative h-80">
+            <img
+              src="kanbanA.jpeg"
+              alt="Astronomy learning platform dashboard with constellations, planets and educational content displayed"
+              class="w-full h-full object-cover"
+            />
+            <div class="project-overlay">
+              <h3 class="text-xl font-bold mb-2">Android Kanban</h3>
+              <p class="text-sm mb-4">
+                A Kanban-based task management app for Android with a clean UI
+                and smooth drag-and-drop experience.
+              </p>
+              <div class="flex space-x-2">
+                <span
+                  class="text-xs px-2 py-1 bg-blue-500 bg-opacity-30 rounded-full"
+                  >Dart</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 3 -->
+          <div class="project-card rounded-lg overflow-hidden relative h-80">
+            <img
+              src="onlen shop.jpeg"
+              alt="NASA API dashboard showing real-time satellite tracking, weather data and astronomical events"
+              class="w-full h-full object-cover"
+            />
+            <div class="project-overlay">
+              <h3 class="text-xl font-bold mb-2">Online Shop</h3>
+              <p class="text-sm mb-4">
+                A user-friendly online shop where customers can browse, buy,
+                Designed to be fast, clean, and mobile-ready.
+              </p>
+              <div class="flex space-x-2">
+                <span
+                  class="text-xs px-2 py-1 bg-blue-500 bg-opacity-30 rounded-full"
+                  >HTML</span
+                >
+                <span
+                  class="text-xs px-2 py-1 bg-purple-500 bg-opacity-30 rounded-full"
+                  >CSS</span
+                >
+                <span
+                  class="text-xs px-2 py-1 bg-green-500 bg-opacity-30 rounded-full"
+                  >JS</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 4 -->
+          <div class="project-card rounded-lg overflow-hidden relative h-80">
+            <img
+              src="company.jpeg"
+              alt="VR astronomy application interface showing planetarium mode with control panel for navigation"
+              class="w-full h-full object-cover"
+            />
+            <div class="project-overlay">
+              <h3 class="text-xl font-bold mb-2">Company Profile</h3>
+              <p class="text-sm mb-4">
+                A website that aims to introduce a school with a user-friendly
+                appearance.
+              </p>
+              <div class="flex space-x-2">
+                <span
+                  class="text-xs px-2 py-1 bg-blue-500 bg-opacity-30 rounded-full"
+                  >Laravel</span
+                >
+                <span
+                  class="text-xs px-2 py-1 bg-purple-500 bg-opacity-30 rounded-full"
+                  >Php</span
+                >
+                <span
+                  class="text-xs px-2 py-1 bg-red-500 bg-opacity-30 rounded-full"
+                  >HTML</span
+                >
+                <span
+                  class="text-xs px-2 py-1 bg-green-500 bg-opacity-30 rounded-full"
+                  >CSS</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 5 -->
+          <div class="project-card rounded-lg overflow-hidden relative h-80">
+            <img
+              src="kanbanW.jpeg"
+              alt="Space weather monitoring dashboard showing solar flares, geomagnetic storms and radiation levels"
+              class="w-full h-full object-cover"
+            />
+            <div class="project-overlay">
+              <h3 class="text-xl font-bold mb-2">Kanban Web</h3>
+              <p class="text-sm mb-4">
+                Monitoring to create a project in real time
+              </p>
+              <div class="flex space-x-2">
+                <span
+                  class="text-xs px-2 py-1 bg-blue-500 bg-opacity-30 rounded-full"
+                  >Laravel</span
+                >
+                <span
+                  class="text-xs px-2 py-1 bg-purple-500 bg-opacity-30 rounded-full"
+                  >Livewire</span
+                >
+                <span
+                  class="text-xs px-2 py-1 bg-red-500 bg-opacity-30 rounded-full"
+                  >Php</span
+                >
+                <span
+                  class="text-xs px-2 py-1 bg-green-500 bg-opacity-30 rounded-full"
+                  >Tailwind CSS</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 6 -->
+          <div class="project-card rounded-lg overflow-hidden relative h-80">
+            <img
+              src="blog.jpeg"
+              alt="Augmented reality mobile app for identifying constellations in the night sky with labels and mythology information"
+              class="w-full h-full object-cover"
+            />
+            <div class="project-overlay">
+              <h3 class="text-xl font-bold mb-2">Blog Laravel</h3>
+              <p class="text-sm mb-4">a simple blog created using laravel</p>
+              <div class="flex space-x-2">
+                <span
+                  class="text-xs px-2 py-1 bg-blue-500 bg-opacity-30 rounded-full"
+                  >Laravel</span
+                >
+                <span
+                  class="text-xs px-2 py-1 bg-purple-500 bg-opacity-30 rounded-full"
+                  >Php</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section
+      id="skills"
+      class="py-20 px-4 md:px-12 lg:px-24 bg-gradient-to-t from-transparent to-black to-90%"
+    >
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-4xl font-bold mb-16 text-center relative">
+          <span class="relative inline-block">
+            MY TECHNICAL SKILLS
+            <span
+              class="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full"
+            ></span>
+          </span>
+        </h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <!-- Skills with progress bars -->
+          <div class="astronaut-card p-6 rounded-lg flex flex-col items-center">
+            <div class="w-16 h-16 mb-4 flex items-center justify-center">
+              <img
+                src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/ae07fd9a-7dd7-4951-9400-e866a78bc554.png"
+                alt="HTML5 logo on a starry background"
+                class="w-full h-full object-contain"
+              />
+            </div>
+            <h3 class="text-lg font-bold mb-2">HTML</h3>
+            <div class="w-full bg-gray-800 rounded-full h-2.5 mb-2">
+              <div
+                class="bg-blue-400 h-2.5 rounded-full"
+                style="width: 100%"
+              ></div>
+            </div>
+            <span class="text-sm text-gray-400">Expert</span>
+          </div>
+
+          <div class="astronaut-card p-6 rounded-lg flex flex-col items-center">
+            <div class="w-16 h-16 mb-4 flex items-center justify-center">
+              <img
+                src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/90e387f7-8fd9-43f0-ba6d-9a32dacf7550.png"
+                alt="CSS3 logo with colorful nebula effect"
+                class="w-full h-full object-contain"
+              />
+            </div>
+            <h3 class="text-lg font-bold mb-2">CSS</h3>
+            <div class="w-full bg-gray-800 rounded-full h-2.5 mb-2">
+              <div
+                class="bg-blue-400 h-2.5 rounded-full"
+                style="width: 100%"
+              ></div>
+            </div>
+            <span class="text-sm text-gray-400">Expert</span>
+          </div>
+
+          <div class="astronaut-card p-6 rounded-lg flex flex-col items-center">
+            <div class="w-16 h-16 mb-4 flex items-center justify-center">
+              <img
+                src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/9f5eb276-be94-47d8-ba89-bed81bce3f8b.png"
+                alt="JavaScript logo in yellow floating in space"
+                class="w-full h-full object-contain"
+              />
+            </div>
+            <h3 class="text-lg font-bold mb-2">JavaScript</h3>
+            <div class="w-full bg-gray-800 rounded-full h-2.5 mb-2">
+              <div
+                class="bg-blue-400 h-2.5 rounded-full"
+                style="width: 60%"
+              ></div>
+            </div>
+            <span class="text-sm text-gray-400">Study</span>
+          </div>
+
+          <div class="astronaut-card p-6 rounded-lg flex flex-col items-center">
+            <div class="w-16 h-16 mb-4 flex items-center justify-center">
+              <img
+                src="njs.jpeg"
+                alt="React logo with orbiting electrons in atomic structure"
+                class="w-full h-full object-contain"
+              />
+            </div>
+            <h3 class="text-lg font-bold mb-2">Node Js</h3>
+            <div class="w-full bg-gray-800 rounded-full h-2.5 mb-2">
+              <div
+                class="bg-blue-400 h-2.5 rounded-full"
+                style="width: 65%"
+              ></div>
+            </div>
+            <span class="text-sm text-gray-400">Study</span>
+          </div>
+
+          <div class="astronaut-card p-6 rounded-lg flex flex-col items-center">
+            <div class="w-16 h-16 mb-4 flex items-center justify-center">
+              <img
+                src="cdc99815-ebbd-4ab5-b919-b80e2e107f5e.jpeg"
+                alt="Vue.js logo with green orbital path around it"
+                class="w-full h-full object-contain"
+              />
+            </div>
+            <h3 class="text-lg font-bold mb-2">Laravel</h3>
+            <div class="w-full bg-gray-800 rounded-full h-2.5 mb-2">
+              <div
+                class="bg-blue-400 h-2.5 rounded-full"
+                style="width: 95%"
+              ></div>
+            </div>
+            <span class="text-sm text-gray-400">Expert</span>
+          </div>
+
+          <div class="astronaut-card p-6 rounded-lg flex flex-col items-center">
+            <div class="w-16 h-16 mb-4 flex items-center justify-center">
+              <img
+                src="3bf45a40-eb50-45f3-a10f-ad1f6eaa0b41.jpeg"
+                alt="Three.js logo with 3D cubes floating in space"
+                class="w-full h-full object-contain"
+              />
+            </div>
+            <h3 class="text-lg font-bold mb-2">PHP</h3>
+            <div class="w-full bg-gray-800 rounded-full h-2.5 mb-2">
+              <div
+                class="bg-blue-400 h-2.5 rounded-full"
+                style="width: 80%"
+              ></div>
+            </div>
+            <span class="text-sm text-gray-400">Expert</span>
+          </div>
+
+          <div class="astronaut-card p-6 rounded-lg flex flex-col items-center">
+            <div class="w-16 h-16 mb-4 flex items-center justify-center">
+              <img
+                src="tailwind.jpeg"
+                alt="Node.js logo with green binary code stream"
+                class="w-full h-full object-contain"
+              />
+            </div>
+            <h3 class="text-lg font-bold mb-2">Tailwind CSS</h3>
+            <div class="w-full bg-gray-800 rounded-full h-2.5 mb-2">
+              <div
+                class="bg-blue-400 h-2.5 rounded-full"
+                style="width: 75%"
+              ></div>
+            </div>
+            <span class="text-sm text-gray-400">Study</span>
+          </div>
+
+          <div class="astronaut-card p-6 rounded-lg flex flex-col items-center">
+            <div class="w-16 h-16 mb-4 flex items-center justify-center">
+              <img
+                src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/264e15fb-6866-4947-85fb-e4fa5ec604c9.png"
+                alt="Figma logo with purple galaxy swirl in the background"
+                class="w-full h-full object-contain"
+              />
+            </div>
+            <h3 class="text-lg font-bold mb-2">Figma</h3>
+            <div class="w-full bg-gray-800 rounded-full h-2.5 mb-2">
+              <div
+                class="bg-blue-400 h-2.5 rounded-full"
+                style="width: 90%"
+              ></div>
+            </div>
+            <span class="text-sm text-gray-400">Expert</span>
+          </div>
+
+          <div class="astronaut-card p-6 rounded-lg flex flex-col items-center">
+            <div class="w-16 h-16 mb-4 flex items-center justify-center">
+              <img
+                src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/d75f4a75-03e4-4c2a-9780-ce98e2adbc25.png"
+                alt="Git logo with colorful version control branches like galaxy arms"
+                class="w-full h-full object-contain"
+              />
+            </div>
+            <h3 class="text-lg font-bold mb-2">Git</h3>
+            <div class="w-full bg-gray-800 rounded-full h-2.5 mb-2">
+              <div
+                class="bg-blue-400 h-2.5 rounded-full"
+                style="width: 85%"
+              ></div>
+            </div>
+            <span class="text-sm text-gray-400">Expert</span>
+          </div>
+
+          <div class="astronaut-card p-6 rounded-lg flex flex-col items-center">
+            <div class="w-16 h-16 mb-4 flex items-center justify-center">
+              <img
+                src="A full-stack framework for Laravel that takes the….jpeg"
+                alt="WebGL logo with glowing 3D mesh in space"
+                class="w-full h-full object-contain"
+              />
+            </div>
+            <h3 class="text-lg font-bold mb-2">Livewire</h3>
+            <div class="w-full bg-gray-800 rounded-full h-2.5 mb-2">
+              <div
+                class="bg-blue-400 h-2.5 rounded-full"
+                style="width: 75%"
+              ></div>
+            </div>
+            <span class="text-sm text-gray-400">Study</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section
+      id="contact"
+      class="py-20 px-4 md:px-12 lg:px-24 relative overflow-hidden"
+    >
+      <div class="absolute inset-0 overflow-hidden">
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-blue-900 to-purple-900 opacity-10"
+        ></div>
+        <div
+          class="absolute -top-64 -right-64 w-[600px] h-[600px] rounded-full bg-blue-500 blur-3xl opacity-20"
+        ></div>
+        <div
+          class="absolute -bottom-64 -left-64 w-[600px] h-[600px] rounded-full bg-purple-500 blur-3xl opacity-20"
+        ></div>
+      </div>
+
+      <div class="max-w-7xl mx-auto relative">
+        <h2 class="text-4xl font-bold mb-16 text-center relative">
+          <span class="relative inline-block">
+            CONTACT ME
+            <span
+              class="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full"
+            ></span>
+          </span>
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h3 class="text-2xl font-bold mb-6">Let's Work Together</h3>
+            <p class="text-lg mb-6">
+              Have an exciting project in mind or want to collaborate? I'm
+              always open to discussing new opportunities and creative ideas.
+            </p>
+
+            <div class="space-y-6">
+              <div class="flex items-start space-x-4">
+                <div
+                  class="mt-1 w-10 h-10 rounded-full bg-blue-500 bg-opacity-20 flex items-center justify-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 text-blue-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="font-bold">My Number</h4>
+                  <p class="text-gray-400">+62 895-3005-3776</p>
+                </div>
+              </div>
+
+              <div class="flex items-start space-x-4">
+                <div
+                  class="mt-1 w-10 h-10 rounded-full bg-purple-500 bg-opacity-20 flex items-center justify-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 text-purple-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="font-bold">My Email</h4>
+                  <p class="text-gray-400">m26ikhsanmaulana26@gmail.com</p>
+                </div>
+              </div>
+
+              <div class="flex items-start space-x-4">
+                <div
+                  class="mt-1 w-10 h-10 rounded-full bg-green-500 bg-opacity-20 flex items-center justify-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 text-green-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="font-bold">My Address</h4>
+                  <p class="text-gray-400">Babakan Antasari</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8">
+              <h4 class="text-xl font-bold mb-4 text-blue-400">
+                Connect With Me
+              </h4>
+              <div class="flex space-x-4">
+                <a
+                  href="https://wa.me/6289530053776"
+                  target="_blank"
+                  class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-green-500 transition-colors"
+                >
+                  <i class="fab fa-whatsapp text-white text-xl"></i>
+                </a>
+
+                <a
+                  href="https://instagram.com/eldiannnnnnnnnnnnnnnn"
+                  target="_blank"
+                  class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-pink-500 transition-colors"
+                >
+                  <i class="fab fa-instagram text-white text-xl"></i>
+                </a>
+
+                <a
+                  href="https://linkedin.com/in/muhamad-ikhsan-maulana-a2a65a326"
+                  target="_blank"
+                  class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-600 transition-colors"
+                >
+                  <i class="fab fa-linkedin-in text-white text-xl"></i>
+                </a>
+
+                <a
+                  href="https://github.com/ikhsannn222"
+                  target="_blank"
+                  class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition-colors"
+                >
+                  <i class="fab fa-github text-white text-xl"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- ✅ MODAL SUKSES -->
+          <div
+            id="successModal"
+            class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50"
+          >
+            <div
+              class="bg-white p-6 rounded-lg shadow-lg text-center max-w-sm w-full"
+            >
+              <h2 class="text-2xl font-bold mb-4 text-green-600">
+                Message Sent!
+              </h2>
+              <p class="mb-4 text-gray-700">
+                Thank you for reaching out. We'll get back to you soon.
+              </p>
+              <button
+                onclick="closeModal()"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+
+          <!-- ✅ FORM KONTAK -->
+          <div class="astronaut-card p-8 rounded-lg">
+            <form
+              id="contactForm"
+              method="POST"
+              class="space-y-6"
+              onsubmit="submitForm(event)"
+            >
+              <!-- Nama -->
+              <div>
+                <label for="name" class="block text-sm font-medium mb-2"
+                  >Full Name</label
+                >
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  class="contact-input w-full px-4 py-3 rounded-lg"
+                  placeholder="Your name"
+                  required
+                />
+              </div>
+
+              <!-- Email -->
+              <div>
+                <label for="email" class="block text-sm font-medium mb-2"
+                  >Email Address</label
+                >
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="contact-input w-full px-4 py-3 rounded-lg"
+                  placeholder="Your email"
+                  required
+                />
+              </div>
+
+              <!-- Subject -->
+              <div>
+                <label for="subject" class="block text-sm font-medium mb-2"
+                  >Subject</label
+                >
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  class="contact-input w-full px-4 py-3 rounded-lg"
+                  placeholder="Subject"
+                  required
+                />
+              </div>
+
+              <!-- Pesan -->
+              <div>
+                <label for="message" class="block text-sm font-medium mb-2"
+                  >Message</label
+                >
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="5"
+                  class="contact-input w-full px-4 py-3 rounded-lg"
+                  placeholder="Your message"
+                  required
+                ></textarea>
+              </div>
+
+              <!-- Tombol Submit -->
+              <button
+                type="submit"
+                class="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white font-bold glow-btn"
+              >
+                SEND MESSAGE
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 md:px-12 lg:px-24 border-t border-gray-800">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-6 md:mb-0">
+            <a
+              href="#"
+              class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600"
+              >ASTROSAN<span class="text-white">PORTFOLIO</span></a
+            >
+            <p class="text-gray-500 mt-2">Exploring the digital universe.</p>
+          </div>
+
+          <div class="flex flex-col items-center md:items-end">
+            <div class="flex space-x-6 mb-4">
+              <a href="#" class="text-gray-400 hover:text-white">Home</a>
+              <a href="#about" class="text-gray-400 hover:text-white">About</a>
+              <a href="#projects" class="text-gray-400 hover:text-white"
+                >Projects</a
+              >
+              <a href="#contact" class="text-gray-400 hover:text-white"
+                >Contact</a
+              >
+            </div>
+            <p class="text-gray-500 text-sm">
+              © AstroSanPortfolio - sansan
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // ⭐ 1. Buat Background Bintang
+        const starsContainer = document.getElementById("stars-container");
+        const starCount = 150;
+
+        for (let i = 0; i < starCount; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
+
+          const size = Math.random() * 3;
+          const posX = Math.random() * 100;
+          const posY = Math.random() * 100;
+          const duration = 2 + Math.random() * 3 + "s";
+          const delay = Math.random() * 5 + "s";
+
+          star.style.width = `${size}px`;
+          star.style.height = `${size}px`;
+          star.style.left = `${posX}%`;
+          star.style.top = `${posY}%`;
+          star.style.setProperty("--duration", duration);
+          star.style.animationDelay = delay;
+
+          if (Math.random() > 0.9) {
+            star.style.backgroundColor = i % 2 === 0 ? "#7f9cf5" : "#a78bfa";
+          }
+
+          starsContainer.appendChild(star);
+        }
+
+        // 🪐 2. Tambahkan Planet Tata Surya
+        const planets = [
+          { name: "Mercury", size: 10, color: "#b1b1b1" },
+          { name: "Venus", size: 14, color: "#e5c07b" },
+          { name: "Earth", size: 16, color: "#61dafb" },
+          { name: "Mars", size: 12, color: "#e06c75" },
+          { name: "Jupiter", size: 22, color: "#d19a66" },
+          { name: "Saturn", size: 20, color: "#c7b480" },
+          { name: "Uranus", size: 18, color: "#56b6c2" },
+          { name: "Neptune", size: 18, color: "#528bff" },
+        ];
+
+        planets.forEach((planet, index) => {
+          const planetEl = document.createElement("div");
+          planetEl.className = "planet";
+          planetEl.title = planet.name;
+
+          planetEl.style.width = `${planet.size}px`;
+          planetEl.style.height = `${planet.size}px`;
+          planetEl.style.backgroundColor = planet.color;
+
+          const posX = Math.random() * 90 + 5;
+          const posY = Math.random() * 90 + 5;
+          planetEl.style.left = `${posX}%`;
+          planetEl.style.top = `${posY}%`;
+
+          planetEl.style.animation = `planet-spin ${
+            8 + index
+          }s linear infinite`;
+
+          starsContainer.appendChild(planetEl);
+        });
+
+        // 🌠 3. Tambahkan Objek Langit Tambahan
+        const skyObjects = [
+          {
+            type: "bright-star",
+            count: 5,
+            size: 8,
+            color: "#ffffff",
+          },
+          {
+            type: "nebula",
+            count: 3,
+            size: 60,
+            color: "rgba(180, 100, 255, 0.2)",
+          },
+          {
+            type: "comet",
+            count: 2,
+            size: 10,
+            color: "#fff",
+            tail: true,
+          },
+          {
+            type: "galaxy",
+            count: 2,
+            size: 40,
+            color: "rgba(200, 200, 255, 0.1)",
+          },
+        ];
+
+        skyObjects.forEach((obj) => {
+          for (let i = 0; i < obj.count; i++) {
+            const el = document.createElement("div");
+
+            if (obj.type === "rocket") {
+              el.innerHTML = `<img src="${obj.image}" alt="Rocket" style="width:${obj.size}px;height:auto;" />`;
+              el.style.position = "absolute";
+            } else {
+              el.className = `sky-object ${obj.type}`;
+              el.style.width = `${obj.size}px`;
+              el.style.height = `${obj.size}px`;
+              el.style.backgroundColor = obj.color;
+              el.style.borderRadius = "50%";
+              el.style.opacity = "0.8";
+
+              if (obj.tail) {
+                el.style.boxShadow = `20px 0 15px -5px rgba(255,255,255,0.3)`;
+                el.style.transform = "rotate(-45deg)";
+              }
+            }
+
+            el.style.left = `${Math.random() * 95 + 2}%`;
+            el.style.top = `${Math.random() * 90 + 5}%`;
+
+            starsContainer.appendChild(el);
+          }
+        });
+
+        // 📩 4. Submit Form ke FormSubmit + Modal
+        const contactForm = document.getElementById("contactForm");
+        if (contactForm) {
+          contactForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(contactForm);
+
+            fetch("https://formsubmit.co/m26ikhsanmaulana26@gmail.com", {
+              method: "POST",
+              body: formData,
+              headers: {
+                Accept: "application/json",
+              },
+            })
+              .then((response) => {
+                if (response.ok) {
+                  contactForm.reset();
+                  showModal();
+                } else {
+                  alert("Something went wrong. Please try again.");
+                }
+              })
+              .catch((error) => {
+                alert("Error: " + error.message);
+              });
+          });
+        }
+
+        function showModal() {
+          document.getElementById("successModal").classList.remove("hidden");
+        }
+
+        window.closeModal = function () {
+          document.getElementById("successModal").classList.add("hidden");
+        };
+
+        // 🧭 5. Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+          anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute("href");
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+              window.scrollTo({
+                top: targetElement.offsetTop - 80,
+                behavior: "smooth",
+              });
+            }
+          });
+        });
+
+        // ✨ 6. Animasi saat Scroll Masuk Viewport
+        const animateOnScroll = () => {
+          const elements = document.querySelectorAll(
+            ".astronaut-card, .project-card, [class^='skill-']"
+          );
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add("animate-fadeIn");
+                  observer.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: 0.1 }
+          );
+
+          elements.forEach((element) => {
+            observer.observe(element);
+          });
+        };
+
+        animateOnScroll();
+      });
+    </script>
+  </body>
+</html>
